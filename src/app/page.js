@@ -1,8 +1,7 @@
-import { Button } from "@heroui/react";
-import Image from "next/image";
+import HeroBanner from "@/components/HeroBanner";
 
 export default function Home() {
   return (
-    <div>I am Easin</div>
+    <HeroBanner></HeroBanner>
   )
 }

@@ -1,5 +1,6 @@
 
 import Link from "next/link";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 const navLinks = [
     { name: "Home", href: "/" },
@@ -51,7 +52,7 @@ export default function Navbar() {
                 {/* Mobile Navigation */}
                 <details className="relative md:hidden">
                     <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg border border-gray-200 text-2xl text-gray-700">
-                        ☰
+                        <GiHamburgerMenu className="text-xl" />
                     </summary>
 
                     <div className="absolute right-0 top-14 w-56 rounded-xl border border-gray-200 bg-white p-4 shadow-xl">
