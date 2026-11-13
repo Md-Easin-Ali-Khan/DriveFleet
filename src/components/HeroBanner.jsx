@@ -44,7 +44,7 @@ export default function HeroBanner() {
                     </p>
 
                     <div className="mt-9 flex flex-wrap gap-4">
-                        <Link href="/cars">
+                        <Link href="/explore-cars">
                             <Button
                                 color="primary"
                                 size="lg"
@@ -56,7 +56,7 @@ export default function HeroBanner() {
                             </Button>
                         </Link>
 
-                        <Link href="/register">
+                        <Link href="/get-started">
                             <Button
                                 variant="bordered"
                                 size="lg"
