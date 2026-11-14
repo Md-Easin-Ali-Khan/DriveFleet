@@ -1,5 +1,6 @@
 
 import Link from "next/link";
+import { FaCarSide, FaEnvelope } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 
 const navLinks = [
@@ -15,9 +16,12 @@ export default function Navbar() {
             <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
 
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2">
-                    <span className="text-2xl font-extrabold tracking-tight text-gray-900">
-                        Drive<span className="text-blue-600">Fleet</span>
+                <Link href="/" className="mb-5 inline-flex items-center gap-2">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600">
+                        <FaCarSide className="text-xl text-white" />
+                    </span>
+                    <span className="text-2xl font-bold tracking-tight">
+                        Drive<span className="text-blue-400">Fleet</span>
                     </span>
                 </Link>
 
