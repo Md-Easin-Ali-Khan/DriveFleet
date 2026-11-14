@@ -1,6 +1,8 @@
+
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import {
     Card,
     CardFooter,
@@ -42,6 +44,8 @@ const cars = [
 ];
 
 export default function FeaturedCars() {
+    const router = useRouter();
+
     return (
         <section className="bg-white px-5 py-20 lg:px-8">
             <div className="mx-auto max-w-7xl">
@@ -64,12 +68,11 @@ export default function FeaturedCars() {
                     </div>
 
                     <Button
-                        as={Link}
-                        href="/cars"
                         color="primary"
                         variant="light"
                         endContent={<FaArrowRight />}
                         className="font-semibold"
+                        onPress={() => router.push("/cars")}
                     >
                         View All Cars
                     </Button>
@@ -94,7 +97,11 @@ export default function FeaturedCars() {
 
                             <CardFooter className="flex-col items-stretch gap-4 p-5">
                                 <div className="flex items-center justify-between">
-                                    <Chip color="primary" variant="flat" size="sm">
+                                    <Chip
+                                        color="primary"
+                                        variant="flat"
+                                        size="sm"
+                                    >
                                         {car.category}
                                     </Chip>
 
@@ -113,15 +120,16 @@ export default function FeaturedCars() {
                                         <p className="text-2xl font-bold text-blue-600">
                                             ৳{car.price}
                                         </p>
-                                        <p className="text-xs text-gray-500">Per day</p>
+                                        <p className="text-xs text-gray-500">
+                                            Per day
+                                        </p>
                                     </div>
 
                                     <Button
-                                        as={Link}
-                                        href="/cars"
                                         color="primary"
                                         radius="lg"
                                         endContent={<FaCar />}
+                                        onPress={() => router.push("/cars")}
                                     >
                                         View Details
                                     </Button>

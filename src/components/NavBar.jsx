@@ -6,6 +6,7 @@ const navLinks = [
     { name: "Home", href: "/" },
     { name: "Explore Cars", href: "/cars" },
     { name: "Add Car", href: "/add-car" },
+    { name: "My Bookings", href: "/my-bookings" },
 ];
 
 export default function Navbar() {
