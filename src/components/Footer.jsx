@@ -34,7 +34,7 @@ const Footer = () => {
                     <div>
                         <Link href="/" className="mb-5 inline-flex items-center gap-2">
                             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600">
-                                <FaCarSide className="text-xl" />
+                                <FaCarSide className="text-xl text-white" />
                             </span>
                             <span className="text-2xl font-bold tracking-tight">
                                 Drive<span className="text-blue-400">Fleet</span>
