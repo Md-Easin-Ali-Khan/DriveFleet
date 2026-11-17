@@ -34,7 +34,7 @@ const benefits = [
 
 export default function WhyChooseUs() {
     return (
-        <section className="relative overflow-hidden bg-slate-50/50 px-5 py-20 lg:px-8 lg:py-28">
+        <section className="relative overflow-hidden bg-slate-950 px-5 py-20 lg:px-8 lg:py-28">
             <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-2 lg:gap-20">
 
                 {/* Left Content */}
@@ -88,7 +88,7 @@ export default function WhyChooseUs() {
                                 key={benefit.number}
                                 shadow="sm"
                                 radius="lg"
-                                className="group border border-slate-200/60 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+                                className="group border border-slate-200/60 bg-slate-900/60 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
                             >
                                 <Card.Content className="flex flex-row items-start gap-5 p-6 md:p-7">
                                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-xl text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:shadow-md group-hover:shadow-primary/30">
@@ -103,7 +103,7 @@ export default function WhyChooseUs() {
                                             <div className="h-px flex-1 bg-slate-100" />
                                         </div>
 
-                                        <h3 className="text-lg font-bold text-slate-900 md:text-xl">
+                                        <h3 className="text-lg font-bold text-gray-500 md:text-xl">
                                             {benefit.title}
                                         </h3>
 

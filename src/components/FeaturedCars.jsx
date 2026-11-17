@@ -1,6 +1,6 @@
-
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -16,38 +16,38 @@ import {
     FaCar,
 } from "react-icons/fa";
 
-const cars = [
-    {
-        name: "Porsche 911 Carrera",
-        category: "Luxury Sports",
-        price: "12,000",
-        seats: 2,
-        image:
-            "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800",
-    },
-    {
-        name: "Mercedes-Benz C-Class",
-        category: "Premium Sedan",
-        price: "8,000",
-        seats: 5,
-        image:
-            "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800",
-    },
-    {
-        name: "BMW 5 Series",
-        category: "Business Sedan",
-        price: "7,000",
-        seats: 5,
-        image:
-            "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
-    },
-];
-
 export default function FeaturedCars() {
     const router = useRouter();
 
+    const [cars, setCars] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    // Fetch Cars from Backend
+    useEffect(() => {
+        const fetchCars = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/cars");
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch cars");
+                }
+
+                const data = await response.json();
+
+                setCars(data);
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCars();
+    }, []);
+
     return (
-        <section className="bg-white px-5 py-20 lg:px-8">
+        <section className="bg-slate-950 px-5 py-20 lg:px-8">
             <div className="mx-auto max-w-7xl">
 
                 {/* Section Heading */}
@@ -78,66 +78,91 @@ export default function FeaturedCars() {
                     </Button>
                 </div>
 
+                {/* Loading State */}
+                {loading && (
+                    <p className="mt-10 text-center text-gray-500">
+                        Loading cars...
+                    </p>
+                )}
+
+                {/* Error State */}
+                {!loading && error && (
+                    <p className="mt-10 text-center text-red-500">
+                        {error}
+                    </p>
+                )}
+
+                {/* Empty State */}
+                {!loading && !error && cars.length === 0 && (
+                    <p className="mt-10 text-center text-gray-500">
+                        No cars available right now.
+                    </p>
+                )}
+
                 {/* Car Cards */}
-                <div className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-                    {cars.map((car) => (
-                        <Card
-                            key={car.name}
-                            shadow="sm"
-                            radius="lg"
-                            className="border border-gray-200"
-                        >
-                            <div className="overflow-hidden p-0">
-                                <img
-                                    src={car.image}
-                                    alt={car.name}
-                                    className="h-60 w-full object-cover transition duration-500 hover:scale-105"
-                                />
-                            </div>
-
-                            <CardFooter className="flex-col items-stretch gap-4 p-5">
-                                <div className="flex items-center justify-between">
-                                    <Chip
-                                        color="primary"
-                                        variant="flat"
-                                        size="sm"
-                                    >
-                                        {car.category}
-                                    </Chip>
-
-                                    <span className="flex items-center gap-2 text-sm text-gray-500">
-                                        <FaUsers />
-                                        {car.seats} Seats
-                                    </span>
+                {!loading && !error && cars.length > 0 && (
+                    <div className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+                        {cars.map((car) => (
+                            <Card
+                                key={car._id}
+                                shadow="sm"
+                                radius="lg"
+                                className="bg-slate-900/60 border border-slate-800"
+                            >
+                                <div className="overflow-hidden p-0">
+                                    <img
+                                        src={car.image}
+                                        alt={car.name}
+                                        className="h-60 w-full object-cover transition duration-500 hover:scale-105"
+                                    />
                                 </div>
 
-                                <h3 className="text-xl font-bold text-slate-900">
-                                    {car.name}
-                                </h3>
+                                <CardFooter className="flex-col items-stretch gap-4 p-5">
+                                    <div className="flex items-center justify-between">
+                                        <Chip
+                                            color="primary"
+                                            variant="flat"
+                                            size="sm"
+                                        >
+                                            {car.category}
+                                        </Chip>
 
-                                <div className="flex items-center justify-between border-t border-gray-100 pt-4">
-                                    <div>
-                                        <p className="text-2xl font-bold text-blue-600">
-                                            ৳{car.price}
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                            Per day
-                                        </p>
+                                        <span className="flex items-center gap-2 text-sm text-gray-500">
+                                            <FaUsers />
+                                            {car.seatCapacity} Seats
+                                        </span>
                                     </div>
 
-                                    <Button
-                                        color="primary"
-                                        radius="lg"
-                                        endContent={<FaCar />}
-                                        onPress={() => router.push("/cars")}
-                                    >
-                                        View Details
-                                    </Button>
-                                </div>
-                            </CardFooter>
-                        </Card>
-                    ))}
-                </div>
+                                    <h3 className="text-xl font-bold text-gray-500">
+                                        {car.name}
+                                    </h3>
+
+                                    <div className="flex items-center justify-between border-t border-gray-500 pt-4">
+                                        <div>
+                                            <p className="text-2xl font-bold text-blue-600">
+                                                ৳{car.pricePerDay.toLocaleString("en-IN")}
+                                            </p>
+
+                                            <p className="text-xs text-gray-500">
+                                                Per day
+                                            </p>
+                                        </div>
+
+                                        <Button
+                                            color="primary"
+                                            radius="lg"
+                                            endContent={<FaCar />}
+                                            onPress={() => router.push("/cars")}
+                                        >
+                                            View Details
+                                        </Button>
+                                    </div>
+                                </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+
             </div>
         </section>
     );

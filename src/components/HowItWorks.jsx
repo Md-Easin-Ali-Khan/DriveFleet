@@ -50,11 +50,8 @@ export default function HowItWorks() {
                         Simple Process
                     </Chip>
 
-                    <h2 className="text-3xl font-extrabold tracking-tight text-white md:text-5xl">
-                        Your Journey Starts{" "}
-                        <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                            in 3 Steps
-                        </span>
+                    <h2 className="pb-3 text-3xl font-extrabold tracking-tight text-gray-500 md:text-5xl">
+                        Your Journey Starts in 3 Steps
                     </h2>
 
                     <p className="text-sm md:text-base leading-relaxed text-slate-400">
@@ -76,7 +73,7 @@ export default function HowItWorks() {
 
                                 <Card
                                     shadow="sm"
-                                    className="relative z-10 h-full border border-slate-800/80 bg-slate-900/60 backdrop-blur-md transition-all duration-300 group-hover:-translate-y-2 group-hover:border-primary/50 group-hover:shadow-2xl group-hover:shadow-primary/10"
+                                    className="relative z-10 h-full border border-slate-800 bg-slate-900/60 backdrop-blur-md transition-all duration-300 group-hover:-translate-y-2 group-hover:border-primary/50 group-hover:shadow-2xl group-hover:shadow-primary/10"
                                     radius="lg"
                                 >
                                     <Card.Content className="p-8">
