@@ -35,7 +35,7 @@ export default function FeaturedCars() {
 
                 const data = await response.json();
 
-                setCars(data);
+                setCars(data.slice(0, 6));
             } catch (error) {
                 setError(error.message);
             } finally {
