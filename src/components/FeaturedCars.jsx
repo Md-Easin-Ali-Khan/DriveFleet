@@ -152,7 +152,7 @@ export default function FeaturedCars() {
                                             color="primary"
                                             radius="lg"
                                             endContent={<FaCar />}
-                                            onPress={() => router.push("/cars")}
+                                            onPress={() => router.push(`/cars/${car._id}`)}
                                         >
                                             View Details
                                         </Button>
