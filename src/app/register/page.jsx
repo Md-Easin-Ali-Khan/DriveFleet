@@ -3,8 +3,75 @@
 
 import Link from "next/link";
 import { FaCarSide } from "react-icons/fa";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const RegisterPage = () => {
+    const router = useRouter();
+
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        photoURL: "",
+        password: "",
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+    };
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const { name, email, photoURL, password } = formData;
+
+        // Password validation
+        if (
+            password.length < 6 ||
+            !/[A-Z]/.test(password) ||
+            !/[a-z]/.test(password)
+        ) {
+            toast.error(
+                "Password must contain uppercase, lowercase and at least 6 characters."
+            );
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:5000/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    photoURL,
+                    password,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Registration failed");
+            }
+
+            toast.success("Registration successful!");
+            router.push("/login");
+
+        } catch (error) {
+            toast.error(error.message || "Something went wrong");
+        }
+    };
+
     return (
         <main className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
             <div className="w-full max-w-md rounded-2xl bg-white p-6 sm:p-8 shadow-sm border border-slate-200">
@@ -32,7 +99,7 @@ const RegisterPage = () => {
                 </div>
 
                 {/* Register Form */}
-                <form className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
 
                     <div>
                         <label className="mb-1 block text-sm font-medium text-slate-700">
@@ -43,6 +110,7 @@ const RegisterPage = () => {
                             type="text"
                             name="name"
                             placeholder="Enter your full name"
+                            onChange={handleChange}
                             className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         />
                     </div>
@@ -56,6 +124,7 @@ const RegisterPage = () => {
                             type="email"
                             name="email"
                             placeholder="Enter your email"
+                            onChange={handleChange}
                             className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         />
                     </div>
@@ -69,6 +138,7 @@ const RegisterPage = () => {
                             type="url"
                             name="photoURL"
                             placeholder="Enter your profile photo URL"
+                            onChange={handleChange}
                             className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         />
                     </div>
@@ -82,6 +152,7 @@ const RegisterPage = () => {
                             type="password"
                             name="password"
                             placeholder="Create a password"
+                            onChange={handleChange}
                             className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         />
 
