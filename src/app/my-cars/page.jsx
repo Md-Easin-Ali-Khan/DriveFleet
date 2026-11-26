@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ const MyCarsPage = () => {
     const [cars, setCars] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Fetch user's cars
     useEffect(() => {
         const fetchMyCars = async () => {
             try {
@@ -34,6 +36,39 @@ const MyCarsPage = () => {
         fetchMyCars();
     }, []);
 
+    // Delete car
+    const handleDelete = async (id) => {
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete this car?"
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+            const response = await fetch(
+                `http://localhost:5000/cars/${id}`,
+                {
+                    method: "DELETE",
+                    credentials: "include",
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to delete car");
+            }
+
+            setCars((previousCars) =>
+                previousCars.filter((car) => car._id !== id)
+            );
+
+            toast.success("Car deleted successfully!");
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex min-h-[60vh] items-center justify-center">
@@ -47,6 +82,7 @@ const MyCarsPage = () => {
     return (
         <main className="min-h-screen bg-slate-50 px-4 py-12">
             <div className="mx-auto max-w-7xl">
+
                 <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
                         <h1 className="text-3xl font-bold text-slate-900">
@@ -68,7 +104,7 @@ const MyCarsPage = () => {
                 {cars.length === 0 ? (
                     <div className="rounded-2xl bg-white p-10 text-center shadow-sm">
                         <h2 className="text-xl font-semibold text-slate-800">
-                            You haven't added any cars yet
+                            You have not added any cars yet
                         </h2>
                         <p className="mt-2 text-slate-500">
                             Add your first car and start listing it for rent.
@@ -107,11 +143,11 @@ const MyCarsPage = () => {
                                         Location: {car.location}
                                     </p>
 
-                                    <div className="mt-5 flex items-center justify-between">
+                                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
                                         <span
                                             className={`rounded-full px-3 py-1 text-xs font-semibold ${car.availability
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-red-100 text-red-700"
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-red-100 text-red-700"
                                                 }`}
                                         >
                                             {car.availability
@@ -119,12 +155,28 @@ const MyCarsPage = () => {
                                                 : "Unavailable"}
                                         </span>
 
-                                        <Link
-                                            href={`/cars/${car._id}`}
-                                            className="font-semibold text-blue-600 hover:underline"
-                                        >
-                                            View Details
-                                        </Link>
+                                        <div className="flex items-center gap-3">
+                                            <Link
+                                                href={`/cars/${car._id}`}
+                                                className="font-semibold text-blue-600 hover:underline"
+                                            >
+                                                View Details
+                                            </Link>
+
+                                            <button
+                                                onClick={() => handleDelete(car._id)}
+                                                className="rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                                            >
+                                                Delete
+                                            </button>
+
+                                            <Link
+                                                href={`/my-cars/${car._id}/edit`}
+                                                className="font-semibold text-blue-600 hover:underline"
+                                            >
+                                                Edit
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
