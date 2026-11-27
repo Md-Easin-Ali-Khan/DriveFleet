@@ -6,6 +6,8 @@ import { toast } from "sonner";
 const MyBookingsPage = () => {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [cancelBookingId, setCancelBookingId] = useState(null);
+    const [isCancelling, setIsCancelling] = useState(false);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -42,6 +44,39 @@ const MyBookingsPage = () => {
             </div>
         );
     }
+
+    const handleCancelBooking = async (bookingId) => {
+        setIsCancelling(true);
+
+        try {
+            const response = await fetch(
+                `http://localhost:5000/bookings/${bookingId}`,
+                {
+                    method: "DELETE",
+                    credentials: "include",
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to cancel booking");
+            }
+
+            setBookings((prevBookings) =>
+                prevBookings.filter(
+                    (booking) => booking._id !== bookingId
+                )
+            );
+
+            toast.success("Booking cancelled successfully!");
+            setCancelBookingId(null);
+        } catch (error) {
+            toast.error(error.message || "Something went wrong");
+        } finally {
+            setIsCancelling(false);
+        }
+    };
 
     return (
         <main className="min-h-screen bg-slate-50 px-4 py-12">
@@ -127,11 +162,51 @@ const MyBookingsPage = () => {
                                         Booking ID: {booking._id}
                                     </p>
                                 </div>
+                                <button
+                                    onClick={() => setCancelBookingId(booking._id)}
+                                    className="mt-4 rounded-lg bg-red-500 px-5 py-2 text-sm font-medium text-white transition hover:bg-red-600"
+                                >
+                                    Cancel Booking
+                                </button>
                             </div>
                         ))}
                     </div>
                 )}
             </div>
+            
+            {cancelBookingId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                        <h2 className="text-xl font-bold text-gray-900">
+                            Cancel Booking?
+                        </h2>
+
+                        <p className="mt-3 text-gray-600">
+                            Are you sure you want to cancel this booking?
+                            This action cannot be undone.
+                        </p>
+
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                onClick={() => setCancelBookingId(null)}
+                                disabled={isCancelling}
+                                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                            >
+                                Keep Booking
+                            </button>
+
+                            <button
+                                onClick={() => handleCancelBooking(cancelBookingId)}
+                                disabled={isCancelling}
+                                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {isCancelling ? "Cancelling..." : "Yes, Cancel"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </main>
     );
 };
