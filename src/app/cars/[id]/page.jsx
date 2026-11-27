@@ -1,15 +1,30 @@
-"use client";
-import { useEffect, useState } from "react";
 
-const CarDetailsPage = ({ params }) => {
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+const CarDetailsPage = () => {
+    const { id } = useParams();
+    const router = useRouter();
+
     const [car, setCar] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    const [driverNeeded, setDriverNeeded] = useState("No");
+    const [specialNote, setSpecialNote] = useState("");
+    const [isBooking, setIsBooking] = useState(false);
+
+    // Fetch car details
     useEffect(() => {
+        if (!id) return;
+
         const fetchCar = async () => {
             try {
-                const { id } = await params;
+                setLoading(true);
+                setError("");
 
                 const response = await fetch(
                     `http://localhost:5000/cars/${id}`
@@ -29,13 +44,82 @@ const CarDetailsPage = ({ params }) => {
         };
 
         fetchCar();
-    }, [params]);
+    }, [id]);
 
-    if (loading) return <p className="p-10 text-center">Loading car details...</p>;
+    // Create booking
+    const handleBooking = async (e) => {
+        e.preventDefault();
 
-    if (error) return <p className="p-10 text-center text-red-500">{error}</p>;
+        if (!car) return;
 
-    if (!car) return <p className="p-10 text-center">Car not found.</p>;
+        if (!car.availability) {
+            toast.error("This car is currently unavailable");
+            return;
+        }
+
+        setIsBooking(true);
+
+        try {
+            const bookingData = {
+                carId: car._id,
+                carName: car.name,
+                pricePerDay: car.pricePerDay,
+                driverNeeded,
+                specialNote,
+            };
+
+            const response = await fetch(
+                "http://localhost:5000/bookings",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                    body: JSON.stringify(bookingData),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to create booking"
+                );
+            }
+
+            toast.success("Car booked successfully!");
+
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setIsBooking(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <p className="p-10 text-center">
+                Loading car details...
+            </p>
+        );
+    }
+
+    if (error) {
+        return (
+            <p className="p-10 text-center text-red-500">
+                {error}
+            </p>
+        );
+    }
+
+    if (!car) {
+        return (
+            <p className="p-10 text-center">
+                Car not found.
+            </p>
+        );
+    }
 
     return (
         <main className="min-h-screen bg-slate-50">
@@ -63,9 +147,9 @@ const CarDetailsPage = ({ params }) => {
                     </h1>
 
                     <p className="mt-3 text-slate-500">
-                        <span>{car.location}</span>
+                        {car.location}
                         <span className="mx-2">·</span>
-                        <span>{car.seatCapacity} Seats</span>
+                        {car.seatCapacity} Seats
                     </p>
                 </div>
 
@@ -112,29 +196,80 @@ const CarDetailsPage = ({ params }) => {
                         <div className="my-6 border-t border-slate-100" />
 
                         <div className="flex items-center justify-between">
-                            <span className="text-slate-600">Availability</span>
+                            <span className="text-slate-600">
+                                Availability
+                            </span>
 
-                            <span className={`rounded-full px-3 py-1 text-sm font-medium ${car.availability
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
-                                }`}>
-                                {car.availability ? "Available" : "Unavailable"}
+                            <span
+                                className={`rounded-full px-3 py-1 text-sm font-medium ${car.availability
+                                        ? "bg-green-100 text-green-700"
+                                        : "bg-red-100 text-red-700"
+                                    }`}
+                            >
+                                {car.availability
+                                    ? "Available"
+                                    : "Unavailable"}
                             </span>
                         </div>
 
                         <div className="mt-4 flex items-center justify-between">
-                            <span className="text-slate-600">Seats</span>
+                            <span className="text-slate-600">
+                                Seats
+                            </span>
+
                             <span className="font-semibold text-slate-900">
                                 {car.seatCapacity}
                             </span>
                         </div>
 
-                        <button
-                            disabled={!car.availability}
-                            className="mt-8 w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-                        >
-                            Book Now
-                        </button>
+                        {/* Booking Form */}
+                        <form onSubmit={handleBooking} className="mt-6 space-y-4">
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-slate-700">
+                                    Driver Needed?
+                                </label>
+
+                                <select
+                                    value={driverNeeded}
+                                    onChange={(e) =>
+                                        setDriverNeeded(e.target.value)
+                                    }
+                                    className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                                >
+                                    <option value="No">No, I will drive</option>
+                                    <option value="Yes">Yes, I need a driver</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-slate-700">
+                                    Special Note
+                                </label>
+
+                                <textarea
+                                    value={specialNote}
+                                    onChange={(e) =>
+                                        setSpecialNote(e.target.value)
+                                    }
+                                    rows={3}
+                                    placeholder="Any special request? (optional)"
+                                    className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={!car.availability || isBooking}
+                                className="w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                            >
+                                {isBooking
+                                    ? "Booking..."
+                                    : car.availability
+                                        ? "Book Now"
+                                        : "Unavailable"}
+                            </button>
+                        </form>
 
                         <p className="mt-4 text-center text-xs text-slate-400">
                             Booking is subject to vehicle availability.
