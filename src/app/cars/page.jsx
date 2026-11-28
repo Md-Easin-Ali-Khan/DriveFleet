@@ -3,9 +3,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { FaSearch, FaSlidersH, FaUsers, FaCar } from "react-icons/fa";
+import {
+    FaSearch,
+    FaSlidersH,
+    FaUsers,
+    FaCar,
+} from "react-icons/fa";
 
-import { Card, CardFooter, Chip, Button } from "@heroui/react";
+import {
+    Card,
+    CardFooter,
+    Chip,
+    Button,
+} from "@heroui/react";
 
 const CarsPage = () => {
     const router = useRouter();
@@ -16,17 +26,24 @@ const CarsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // Fetch All Cars
+    // Fetch all cars
     useEffect(() => {
         const fetchCars = async () => {
             try {
-                const response = await fetch("http://localhost:5000/cars");
+                const response = await fetch(
+                    "http://localhost:5000/cars"
+                );
 
                 if (!response.ok) {
                     throw new Error("Failed to fetch cars");
                 }
 
                 const data = await response.json();
+
+                if (!Array.isArray(data)) {
+                    throw new Error("Invalid car data received");
+                }
+
                 setCars(data);
             } catch (error) {
                 setError(error.message);
@@ -38,24 +55,34 @@ const CarsPage = () => {
         fetchCars();
     }, []);
 
-    // Search and Category Filter
+    // Get unique categories
+    const categories = [
+        ...new Set(
+            cars
+                .map((car) => car.category)
+                .filter(Boolean)
+        ),
+    ];
+
+    // Search and category filter
     const filteredCars = cars.filter((car) => {
-        const matchesSearch = car.name
-            .toLowerCase()
-            .includes(search.toLowerCase());
+        const carName = String(car.name || "").toLowerCase();
+        const searchValue = search.trim().toLowerCase();
+
+        const matchesSearch = carName.includes(searchValue);
 
         const matchesCategory = category
-            ? car.category.toLowerCase() === category.toLowerCase()
+            ? car.category?.toLowerCase() === category.toLowerCase()
             : true;
 
         return matchesSearch && matchesCategory;
     });
 
     return (
-        <main className="min-h-screen bg-slate-950">
+        <main className="min-h-screen bg-slate-50">
 
             {/* Hero Section */}
-            <section className=" px-6 py-20 text-center text-white">
+            <section className="bg-slate-950 px-6 py-20 text-center text-white">
                 <div className="mx-auto max-w-3xl">
                     <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-blue-400">
                         Explore Our Collection
@@ -113,45 +140,85 @@ const CarsPage = () => {
                         className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 outline-none focus:border-blue-500"
                     >
                         <option value="">All Car Types</option>
-                        {[...new Set(cars.map((car) => car.category))].map(
-                            (item) => (
-                                <option key={item} value={item}>
-                                    {item}
-                                </option>
-                            )
-                        )}
+
+                        {categories.map((item) => (
+                            <option key={item} value={item}>
+                                {item}
+                            </option>
+                        ))}
                     </select>
+
+                    {(search || category) && (
+                        <button
+                            onClick={() => {
+                                setSearch("");
+                                setCategory("");
+                            }}
+                            className="rounded-xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-200"
+                        >
+                            Clear Filters
+                        </button>
+                    )}
                 </div>
 
                 {/* Results Count */}
-                <p className="mt-8 text-sm text-slate-500">
-                    Showing {filteredCars.length} of {cars.length} cars
-                </p>
+                {!loading && !error && (
+                    <p className="mt-8 text-sm text-slate-500">
+                        Showing {filteredCars.length} of {cars.length} cars
+                    </p>
+                )}
 
                 {/* Loading */}
                 {loading && (
-                    <p className="py-16 text-center text-slate-500">
-                        Loading cars...
-                    </p>
+                    <div className="py-20 text-center">
+                        <p className="text-lg font-medium text-slate-500">
+                            Loading cars...
+                        </p>
+                    </div>
                 )}
 
                 {/* Error */}
                 {!loading && error && (
-                    <p className="py-16 text-center text-red-500">
-                        {error}
-                    </p>
+                    <div className="mt-8 rounded-2xl bg-red-50 px-6 py-16 text-center">
+                        <h3 className="text-lg font-semibold text-red-600">
+                            Unable to load cars
+                        </h3>
+
+                        <p className="mt-2 text-sm text-red-500">
+                            {error}
+                        </p>
+
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="mt-5 rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-700"
+                        >
+                            Try Again
+                        </button>
+                    </div>
                 )}
 
                 {/* Empty Result */}
                 {!loading && !error && filteredCars.length === 0 && (
-                    <div className="mt-8 rounded-2xl bg-white px-6 py-16 text-center">
-                        <h3 className="text-lg font-semibold text-slate-800">
+                    <div className="mt-8 rounded-2xl bg-white px-6 py-16 text-center shadow-sm">
+                        <FaCar className="mx-auto text-4xl text-slate-300" />
+
+                        <h3 className="mt-4 text-lg font-semibold text-slate-800">
                             No cars found
                         </h3>
 
                         <p className="mt-2 text-sm text-slate-500">
                             Try another search or category.
                         </p>
+
+                        <button
+                            onClick={() => {
+                                setSearch("");
+                                setCategory("");
+                            }}
+                            className="mt-5 font-semibold text-blue-600 hover:underline"
+                        >
+                            Clear Filters
+                        </button>
                     </div>
                 )}
 
@@ -163,12 +230,12 @@ const CarsPage = () => {
                                 key={car._id}
                                 shadow="sm"
                                 radius="lg"
-                                className="border border-gray-200"
+                                className="overflow-hidden border border-gray-200"
                             >
                                 <div className="overflow-hidden">
                                     <img
                                         src={car.image}
-                                        alt={car.name}
+                                        alt={car.name || "Rental car"}
                                         className="h-60 w-full object-cover transition duration-500 hover:scale-105"
                                     />
                                 </div>
@@ -185,7 +252,7 @@ const CarsPage = () => {
 
                                         <span className="flex items-center gap-2 text-sm text-gray-500">
                                             <FaUsers />
-                                            {car.seatCapacity} Seats
+                                            {car.seatCapacity || "N/A"} Seats
                                         </span>
                                     </div>
 
@@ -193,10 +260,14 @@ const CarsPage = () => {
                                         {car.name}
                                     </h3>
 
+                                    <p className="text-sm text-slate-500">
+                                        {car.brand}
+                                    </p>
+
                                     <div className="flex items-center justify-between border-t border-gray-100 pt-4">
                                         <div>
                                             <p className="text-2xl font-bold text-blue-600">
-                                                ৳{car.pricePerDay.toLocaleString("en-IN")}
+                                                ৳{Number(car.pricePerDay || 0).toLocaleString("en-IN")}
                                             </p>
 
                                             <p className="text-xs text-gray-500">
@@ -208,7 +279,9 @@ const CarsPage = () => {
                                             color="primary"
                                             radius="lg"
                                             endContent={<FaCar />}
-                                            onPress={() => router.push(`/cars/${car._id}`)}
+                                            onPress={() =>
+                                                router.push(`/cars/${car._id}`)
+                                            }
                                         >
                                             View Details
                                         </Button>

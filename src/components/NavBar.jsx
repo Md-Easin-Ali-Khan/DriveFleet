@@ -17,7 +17,7 @@ const profileLinks = [
     { name: "My Profile", href: "/my-profile" },
     { name: "Add Car", href: "/add-car" },
     { name: "My Bookings", href: "/my-bookings" },
-    { name: "My Added Cars", href: "/my-added-cars" },
+    { name: "My Added Cars", href: "/my-cars" },
 ];
 
 export default function Navbar() {
